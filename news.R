@@ -18,8 +18,6 @@ View(ds)
 data<-ds[c(1:10),]
 View(data)
 
-#data$content <- gsub("[^\x20-\x7E]", "", data$content)
-
 #removing the characters other than unicode 8
 
 phrase_clean <- gsub("[^[:alnum:][:blank:]?&/\\-]", "", data$content)
