@@ -1,5 +1,3 @@
-# importing libraries
-
 library(tidyverse)
 library(tidytext)
 library(topicmodels) 
