@@ -22,14 +22,17 @@ View(data)
 
 phrase_clean <- gsub("[^[:alnum:][:blank:]?&/\\-]", "", data$content)
 data$content <- gsub("U00..", "", phrase_clean)
+
 doc_ids <- c(1:10)
 df <- data.frame(doc_id = doc_ids, text = data$content, stringsAsFactors = FALSE)
 corpus <- Corpus(DataframeSource(df))
 inspect(corpus)
+
+# for removing numbers,blank spaces, ...
 corpus <- tm_map(corpus, content_transformer(tolower))
 corpus <- tm_map(corpus, removePunctuation)
 corpus <- tm_map(corpus,removeWords,stopwords("english"))
-corpus <- tm_map(corpus,removeWords,c("via", "news", "tweet", " ","@\\w+","http.+ |http.+$","amp"))
+corpus <- tm_map(corpus,removeWords,c("via", "news"," ","@\\w+","http.+ |http.+$"))
 corpus <- tm_map(corpus, removeNumbers) 
 corpus <- tm_map(corpus,stripWhitespace)
 dtm <- DocumentTermMatrix(corpus)
@@ -38,7 +41,7 @@ corpus<-corpus[-as.numeric(empty.rows)]
 dtm <- DocumentTermMatrix(corpus)
 inspect(dtm[1:5, 1:5])
 findFreqTerms(dtm, 100)
-
+# Constructing document text matrix
 dtm.mx <- as.matrix(dtm)
 frequency <- colSums(dtm.mx)
 frequency <- sort(frequency, decreasing=TRUE)
