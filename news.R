@@ -11,12 +11,16 @@ library(dplyr)
 library(ggplot2)
 library(tm)
 library(readr)
-ds <- read_csv("C:/Users/Gokul S/Desktop/MadurAI Hackathon/project/data1.csv")
+library(RSentiment)
+
+ds <- read_csv("C:/Users/Gokul S/Desktop/MadurAI Hackathon/project/data12.csv")
 View(ds)
 data<-ds[c(1:10),]
 View(data)
- 
- #removing the characters other than unicode 8
+
+#data$content <- gsub("[^\x20-\x7E]", "", data$content)
+
+#removing the characters other than unicode 8
 
 phrase_clean <- gsub("[^[:alnum:][:blank:]?&/\\-]", "", data$content)
 data$content <- gsub("U00..", "", phrase_clean)
@@ -25,26 +29,28 @@ doc_ids <- c(1:10)
 df <- data.frame(doc_id = doc_ids, text = data$content, stringsAsFactors = FALSE)
 corpus <- Corpus(DataframeSource(df))
 inspect(corpus)
-
-# for removing numbers,blank spaces, ...
 corpus <- tm_map(corpus, content_transformer(tolower))
 corpus <- tm_map(corpus, removePunctuation)
 corpus <- tm_map(corpus,removeWords,stopwords("english"))
-corpus <- tm_map(corpus,removeWords,c("via", "news"," ","@\\w+","http.+ |http.+$"))
+corpus <- tm_map(corpus,removeWords,c("via", "news", "tweet", " ","@\\w+","http.+ |http.+$","amp"))
 corpus <- tm_map(corpus, removeNumbers) 
 corpus <- tm_map(corpus,stripWhitespace)
 dtm <- DocumentTermMatrix(corpus)
 rowTotals<-apply(dtm,1,sum)
+#empty.rows<-dtm[rowTotals==0,]$dimnames[1][[1]]
 corpus<-corpus[-as.numeric(empty.rows)]
 dtm <- DocumentTermMatrix(corpus)
 inspect(dtm[1:5, 1:5])
 findFreqTerms(dtm, 100)
-# Constructing document text matrix
+
 dtm.mx <- as.matrix(dtm)
 frequency <- colSums(dtm.mx)
 frequency <- sort(frequency, decreasing=TRUE)
 frequency[0:24] 
+
 findAssocs(dtm, "aleppo", 0.1) 
+
+
 burnin <- 4000
 iter <- 2000
 thin <- 500
@@ -68,3 +74,6 @@ topicProbabilities <- as.data.frame(ldaOut@gamma)
 write.csv(topicProbabilities,file=paste("LDAGibbs",k,"TopicProbabilities.csv"))
 topicProbabilities[1:5,]
 
+#sentiment Analysis
+
+calculate_sentiment(data$content)
