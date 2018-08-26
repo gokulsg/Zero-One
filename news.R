@@ -35,7 +35,6 @@ corpus <- tm_map(corpus, removeNumbers)
 corpus <- tm_map(corpus,stripWhitespace)
 dtm <- DocumentTermMatrix(corpus)
 rowTotals<-apply(dtm,1,sum)
-#empty.rows<-dtm[rowTotals==0,]$dimnames[1][[1]]
 corpus<-corpus[-as.numeric(empty.rows)]
 dtm <- DocumentTermMatrix(corpus)
 inspect(dtm[1:5, 1:5])
